@@ -1,8 +1,6 @@
 library table_view;
 
-import 'package:angualr/angular.dart';
+import 'package:angular/angular.dart';
 
-@Component(selector: 'table-view')
-class TableView {
-  
-}
+@Component(selector: 'table-view', templateUrl: 'table_view.html')
+class TableView {}
