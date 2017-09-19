@@ -16,4 +16,6 @@ void main() {
     fixture = await testBed.create();
   });
 
+  tearDown(disposeAnyRunningTest);
+
 }
