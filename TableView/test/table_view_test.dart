@@ -18,4 +18,9 @@ void main() {
 
   tearDown(disposeAnyRunningTest);
 
+  group('TableView component', () {
+    test('can render a table', () async {
+      fixture.update((TableView tableView) {});
+    });
+  });
 }

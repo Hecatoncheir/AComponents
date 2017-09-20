@@ -18,7 +18,7 @@ transformers:
 - angular:
       entry_points:
         - test/client/**_test.dart
-        - test/example/simple/**.dart
+        - example/**.dart
 - test/pub_serve:
       $include: test/**_test{.*,}.dart
 - $dart2js:
