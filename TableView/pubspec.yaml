@@ -17,7 +17,7 @@ dev_dependencies:
 transformers:
 - angular:
       entry_points:
-        - test/client/**_test.dart
+        - test/**_test.dart
         - example/**.dart
 - test/pub_serve:
       $include: test/**_test{.*,}.dart
