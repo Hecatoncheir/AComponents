@@ -1,3 +1,13 @@
+Do not forget fonts and MDL styles:
+```
+<!--MDL-->
+<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+<!--Icon Font-->
+<link rel="stylesheet"
+      type="text/css"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons">
+```
+    
 Use:
 ```
 @Component(
