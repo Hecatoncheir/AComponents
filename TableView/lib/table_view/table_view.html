@@ -1,15 +1,19 @@
 <table class="mdl-data-table mdl-shadow--2dp">
     <thead>
     <tr>
-        <th *ngFor="let column of columns; let index=index;"
-            class="mdl-data-table__cell--non-numeric">{{column['name']}}
-        </th>
+        <template ngFor let-column [ngForOf]="columns" let-index="index">
+            <th *ngIf="column['hidden'] == null || column['hidden'] == false"
+                class="mdl-data-table__cell--non-numeric">{{column['name']}}
+            </th>
+        </template>
     </tr>
     </thead>
 
     <tbody>
     <tr *ngFor="let row of rows; let index=index; let odd=odd;">
-        <td *ngFor="let field of row.keys">{{row[field]}}</td>
+        <template ngFor let-column [ngForOf]="columns" let-index="index">
+            <td *ngIf="column['hidden'] == null || column['hidden'] == false">{{row[column['field']]}}</td>
+        </template>
     </tr>
     </tbody>
 </table>

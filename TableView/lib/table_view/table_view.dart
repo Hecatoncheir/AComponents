@@ -5,7 +5,7 @@ import 'package:angular/angular.dart';
 @Component(
     selector: 'table-view',
     templateUrl: 'table_view.html',
-    directives: const [NgFor],
+    directives: const [NgFor, NgIf],
     inputs: const <String>['columns', 'rows'])
 class TableView {
   @Input()
