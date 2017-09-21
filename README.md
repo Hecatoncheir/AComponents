@@ -14,3 +14,6 @@ For run tests for component:
 ```
 pub run angular_test --test-arg=--tags=aot --test-arg=--platform=dartium  --test-arg=--reporter=expanded
 ```
+
+## Components
+#### TableView - [Readme](https://github.com/Rasarts/AComponents/blob/table_view/TableView/README.md)
