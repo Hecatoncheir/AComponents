@@ -11,6 +11,11 @@ class TableView {
   @Input()
   List<Map<String, dynamic>> columns;
 
-  @Input()
-  List<Map<String, dynamic>> rows;
+  List<Map<String, dynamic>> _rows;
+  List<Map<String, dynamic>> get rows => _rows;
+
+  @Input('rows')
+  void set rows(List<Map<String, dynamic>> rowsList) {
+    _rows = rowsList;
+  }
 }
