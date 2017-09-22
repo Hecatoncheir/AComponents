@@ -36,6 +36,13 @@ class TestedTableView {
   PageLoaderElement _table;
   Future<String> get table => _table.visibleText;
 
+  Stream<PageLoaderElement> _firstColumn() =>
+      _table.getElementsByCss('table thead th:first-child');
+  Future<String> get firstColumn =>
+      _firstColumn().first.then((PageLoaderElement firstColumnInTable) {
+        return firstColumnInTable.visibleText;
+      });
+
   Stream<PageLoaderElement> _firstRow() =>
       _table.getElementsByCss('table tbody tr:first-child');
   Future<String> get firstRow =>
@@ -62,23 +69,50 @@ void main() {
   tearDownAll(disposeAnyRunningTest);
 
   setUp(() async {
+    fixture.update((TableView tableView) {
+      tableView
+        ..rows = rows
+        ..columns = columns;
+    });
+
+    testedTableView = await fixture.resolvePageObject(TestedTableView);
+  });
+
+  tearDown(() async {
+    fixture.update((TableView tableView) {
+      tableView
+        ..rows = null
+        ..columns = null;
+    });
+
     testedTableView = await fixture.resolvePageObject(TestedTableView);
   });
 
   group('TableView component', () {
     test('can render a table', () async {
-      expect(await testedTableView.table, isEmpty);
+      expect(await testedTableView.table, isNotEmpty);
+      expect(await testedTableView.firstColumn, equals('Row Id'));
+      expect(await testedTableView.firstRow, equals('1'));
+    });
+  });
+
+  group('Columns', () {
+    test('can be hidden', () async {
+      expect(await testedTableView.firstRow, equals('1'));
+
+      List<Map<String, dynamic>> updatedWithHiddenColumn =
+          new List.from(columns);
+      updatedWithHiddenColumn.first['hidden'] = true;
 
       fixture.update((TableView tableView) {
         tableView
           ..rows = rows
-          ..columns = columns;
+          ..columns = updatedWithHiddenColumn;
       });
 
       testedTableView = await fixture.resolvePageObject(TestedTableView);
-      expect(await testedTableView.table, isNotEmpty);
 
-      expect(await testedTableView.firstRow, equals('1'));
+      expect(await testedTableView.firstColumn, equals('First column'));
     });
   });
 }
