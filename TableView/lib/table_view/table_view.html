@@ -1,7 +1,7 @@
 <table class="mdl-data-table mdl-shadow--2dp">
     <thead>
     <tr>
-        <template ngFor let-column [ngForOf]="columns" let-index="index">
+        <template ngFor let-column [ngForOf]="columns" let-index="index" [ngForTrackBy]="columnTrack">
             <th *ngIf="column['hidden'] == null || column['hidden'] == false"
                 class="mdl-data-table__cell--non-numeric">{{column['name']}}
             </th>
@@ -11,7 +11,7 @@
 
     <tbody>
     <tr *ngFor="let row of rows; let index=index; let odd=odd;">
-        <template ngFor let-column [ngForOf]="columns" let-index="index">
+        <template ngFor let-column [ngForOf]="columns" let-index="index" [ngForTrackBy]="columnTrack">
             <td *ngIf="column['hidden'] == null || column['hidden'] == false">{{row[column['field']]}}</td>
         </template>
     </tr>

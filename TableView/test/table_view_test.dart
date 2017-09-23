@@ -113,6 +113,14 @@ void main() {
       testedTableView = await fixture.resolvePageObject(TestedTableView);
 
       expect(await testedTableView.firstColumn, equals('First column'));
+
+      fixture.update((TableView tableView) {
+        tableView.columns.first['hidden'] = false;
+      });
+
+      testedTableView = await fixture.resolvePageObject(TestedTableView);
+
+      expect(await testedTableView.firstColumn, equals('Row Id'));
     });
   });
 }

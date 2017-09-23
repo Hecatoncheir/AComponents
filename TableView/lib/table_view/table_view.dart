@@ -11,6 +11,10 @@ class TableView {
   @Input()
   List<Map<String, dynamic>> columns;
 
+  Map<String, dynamic> columnTrack(int index, dynamic item) {
+    return columns[index];
+  }
+
   List<Map<String, dynamic>> _rows;
   List<Map<String, dynamic>> get rows => _rows;
 
