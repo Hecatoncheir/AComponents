@@ -7,7 +7,7 @@ import 'package:table_view/components.dart';
     template: """
       <material-checkbox
           [(checked)]="columns.first['hidden']"
-          label="Hide first column">
+          label="Is Row Id column must be hidden?">
       </material-checkbox>
       
       <table-view [columns]='columns' [rows]='rows'></table-view>
@@ -16,8 +16,20 @@ import 'package:table_view/components.dart';
     providers: const [materialProviders])
 class TableViewSimpleExample {
   List<Map<String, dynamic>> columns = <Map<String, dynamic>>[
-    {"id": 0, "name": "Row Id", "field": "id", "sort": "asc", "hidden": true},
-    {"id": 01, "name": "First column", "field": "firstColumn"},
+    {
+      "id": 0,
+      "name": "Row Id",
+      "field": "id",
+      "sort": "asc",
+      "sortable": true,
+      "hidden": true
+    },
+    {
+      "id": 01,
+      "name": "First column",
+      "field": "firstColumn",
+      "sortable": true,
+    },
     {"id": 02, "name": "Second column", "field": "secondColumn"},
     {"id": 03, "name": "Third column", "field": "thridColumn"}
   ];
@@ -25,13 +37,13 @@ class TableViewSimpleExample {
   List<Map<String, dynamic>> rows = <Map<String, dynamic>>[
     {
       "id": 01,
-      "firstColumn": "First column value",
+      "firstColumn": "A First column value",
       "secondColumn": "Second column value",
       "thridColumn": "Thrid column value"
     },
     {
       "id": 02,
-      "firstColumn": "First column value",
+      "firstColumn": "B First column value",
       "secondColumn": "Second column value",
       "thridColumn": "Thrid column value"
     },

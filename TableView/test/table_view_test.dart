@@ -10,7 +10,14 @@ import 'package:test/test.dart';
 import 'package:table_view/table_view/table_view.dart';
 
 List<Map<String, dynamic>> columns = <Map<String, dynamic>>[
-  {"id": 0, "name": "Row Id", "field": "id", "sort": "asc", "hidden": false},
+  {
+    "id": 0,
+    "name": "Row Id",
+    "field": "id",
+    "sortable": true,
+    "sort": "asc",
+    "hidden": false
+  },
   {"id": 01, "name": "First column", "field": "firstColumn"},
   {"id": 02, "name": "Second column", "field": "secondColumn"},
   {"id": 03, "name": "Third column", "field": "thirdColumn"}
@@ -37,7 +44,7 @@ class TestedTableView {
   Future<String> get table => _table.visibleText;
 
   Stream<PageLoaderElement> _firstColumn() =>
-      _table.getElementsByCss('table thead th:first-child');
+      _table.getElementsByCss('table thead th:first-child span');
   Future<String> get firstColumn =>
       _firstColumn().first.then((PageLoaderElement firstColumnInTable) {
         return firstColumnInTable.visibleText;

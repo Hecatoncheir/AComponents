@@ -1,9 +1,11 @@
 library table_view;
 
+import 'dart:async';
 import 'package:angular/angular.dart';
+import 'package:angular_components/angular_components.dart';
 
 //List<Map<String, dynamic>> columns = <Map<String, dynamic>>[
-//{"id": 0, "name": "Row Id", "field": "id", "sort": "asc", "hidden": false},
+//{"id": 0, "name": "Row Id", "field": "id", "sortable": true, "sort": "asc", "hidden": false},
 //{"id": 01, "name": "First column", "field": "firstColumn"},
 //{"id": 02, "name": "Second column", "field": "secondColumn"},
 //{"id": 03, "name": "Third column", "field": "thirdColumn"}
@@ -26,14 +28,30 @@ import 'package:angular/angular.dart';
 @Component(
     selector: 'table-view',
     templateUrl: 'table_view.html',
-    directives: const [NgFor, NgIf],
-    inputs: const <String>['columns', 'rows'])
+    directives: const [
+      NgFor,
+      NgIf,
+      MaterialInputComponent,
+      MaterialButtonComponent,
+      MaterialIconComponent
+    ],
+    providers: const [
+      materialProviders
+    ],
+    inputs: const <String>[
+      'columns',
+      'rows'
+    ])
 class TableView {
   @Input()
   List<Map<String, dynamic>> columns;
 
   Map<String, dynamic> columnTrack(int index, dynamic item) {
     return columns[index];
+  }
+
+  Map<String, dynamic> rowTrack(int index, dynamic item) {
+    return rows[index];
   }
 
   List<Map<String, dynamic>> _rows;
@@ -90,6 +108,29 @@ class TableView {
     }
 
     return rows;
+  }
+
+  Future<Null> changeSortTypeOfColumn(
+      int columnIndex, String newSortType) async {
+    Map<String, dynamic> columnOfChangingSort = columns[columnIndex];
+
+    columns.forEach((Map<String, dynamic> column) async {
+      /// Other sorting must be disabled for now
+      if (column != columnOfChangingSort && column['sortable'] == true) {
+        column['sort'] = null;
+      }
+
+      if (column == columnOfChangingSort) {
+        column['sort'] = newSortType;
+      }
+    });
+
+    List<Map<String, String>> fieldsWithSortingTypes =
+        getFieldsForSorting(columns);
+
+    List<Map<String, dynamic>> sortedRows =
+        sortRows(rows, fieldsWithSortingTypes);
+    rows = sortedRows;
   }
 
   /// All operations is mutable
