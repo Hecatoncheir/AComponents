@@ -9,7 +9,8 @@ import 'package:test/test.dart';
 
 import 'package:table_view/table_view/table_view.dart';
 
-List<Map<String, dynamic>> columns = <Map<String, dynamic>>[
+List<Map<String, dynamic>> columns;
+List<Map<String, dynamic>> _columns = <Map<String, dynamic>>[
   {
     "id": 0,
     "name": "Row Id",
@@ -18,21 +19,32 @@ List<Map<String, dynamic>> columns = <Map<String, dynamic>>[
     "sort": "asc",
     "hidden": false
   },
-  {"id": 01, "name": "First column", "field": "firstColumn"},
-  {"id": 02, "name": "Second column", "field": "secondColumn"},
+  {
+    "id": 01,
+    "name": "First column",
+    "field": "firstColumn",
+    "sortable": true,
+    "filter": null,
+  },
+  {
+    "id": 02,
+    "name": "Second column",
+    "field": "secondColumn",
+  },
   {"id": 03, "name": "Third column", "field": "thirdColumn"}
 ];
 
-List<Map<String, dynamic>> rows = <Map<String, dynamic>>[
+List<Map<String, dynamic>> rows;
+List<Map<String, dynamic>> _rows = <Map<String, dynamic>>[
   {
     "id": 01,
-    "firstColumn": "First column value",
+    "firstColumn": "A First column value",
     "secondColumn": "Second column value",
     "thirdColumn": "Third column value"
   },
   {
     "id": 02,
-    "firstColumn": "First column value",
+    "firstColumn": "B First column value",
     "secondColumn": "Second column value",
     "thirdColumn": "Third column value"
   },
@@ -41,10 +53,12 @@ List<Map<String, dynamic>> rows = <Map<String, dynamic>>[
 class TestedTableView {
   @ByTagName('table')
   PageLoaderElement _table;
+
   Future<String> get table => _table.visibleText;
 
   Stream<PageLoaderElement> _firstColumn() =>
       _table.getElementsByCss('table thead th:first-child span');
+
   Future<String> get firstColumn =>
       _firstColumn().first.then((PageLoaderElement firstColumnInTable) {
         return firstColumnInTable.visibleText;
@@ -52,6 +66,7 @@ class TestedTableView {
 
   Stream<PageLoaderElement> _firstRow() =>
       _table.getElementsByCss('table tbody tr:first-child');
+
   Future<String> get firstRow =>
       _firstRow().first.then((PageLoaderElement firstRowInTable) {
         return firstRowInTable
@@ -75,14 +90,10 @@ void main() {
 
   tearDownAll(disposeAnyRunningTest);
 
-  setUp(() async {
-    fixture.update((TableView tableView) {
-      tableView
-        ..columns = columns
-        ..rows = rows;
-    });
-
-    testedTableView = await fixture.resolvePageObject(TestedTableView);
+  /// Because operations in TableView component a mutable a columns and rows
+  setUp(() {
+    columns = new List.from(_columns);
+    rows = new List.from(_rows);
   });
 
   tearDown(() async {
@@ -97,6 +108,14 @@ void main() {
 
   group('TableView component', () {
     test('can render a table', () async {
+      fixture.update((TableView tableView) {
+        tableView
+          ..columns = columns
+          ..rows = rows;
+      });
+
+      testedTableView = await fixture.resolvePageObject(TestedTableView);
+
       expect(await testedTableView.table, isNotEmpty);
       expect(await testedTableView.firstColumn, equals('Row Id'));
       expect(await testedTableView.firstRow, equals('1'));
@@ -157,6 +176,26 @@ void main() {
       testedTableView = await fixture.resolvePageObject(TestedTableView);
 
       expect(await testedTableView.firstRow, equals('2'));
+    });
+  });
+
+  group('Rows', () {
+    test('can be filtered', () async {
+      List<Map<String, dynamic>> columnsWithSecondColumnFilterValue =
+          new List.from(columns);
+      columnsWithSecondColumnFilterValue[0]['sortable'] = false;
+      columnsWithSecondColumnFilterValue[0]['sort'] = 'asc';
+      columnsWithSecondColumnFilterValue[0]['hidden'] = true;
+      columnsWithSecondColumnFilterValue[1]['filter'] = 'B first';
+
+      fixture.update((TableView tableView) {
+        tableView
+          ..columns = columnsWithSecondColumnFilterValue
+          ..rows = rows;
+      });
+
+      testedTableView = await fixture.resolvePageObject(TestedTableView);
+      expect(await testedTableView.firstRow, equals('B First column value'));
     });
   });
 }

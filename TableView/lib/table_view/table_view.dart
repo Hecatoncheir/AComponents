@@ -65,6 +65,8 @@ class TableView {
         new List<Map<String, String>>();
 
     for (Map<String, dynamic> column in columns) {
+      if (column['sortable'] == false) continue;
+
       String sortType = column['sort'];
       if (sortType != null && sortType.isNotEmpty) {
         String sortedField = column['field'];

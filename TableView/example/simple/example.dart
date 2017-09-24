@@ -20,8 +20,8 @@ class TableViewSimpleExample {
       "id": 0,
       "name": "Row Id",
       "field": "id",
+      "sortable": false,
       "sort": "asc",
-      "sortable": true,
       "hidden": true
     },
     {
@@ -29,9 +29,14 @@ class TableViewSimpleExample {
       "name": "First column",
       "field": "firstColumn",
       "sortable": true,
+      "filter": 'B first',
     },
-    {"id": 02, "name": "Second column", "field": "secondColumn"},
-    {"id": 03, "name": "Third column", "field": "thridColumn"}
+    {
+      "id": 02,
+      "name": "Second column",
+      "field": "secondColumn",
+    },
+    {"id": 03, "name": "Third column", "field": "thirdColumn"}
   ];
 
   List<Map<String, dynamic>> rows = <Map<String, dynamic>>[
@@ -39,13 +44,13 @@ class TableViewSimpleExample {
       "id": 01,
       "firstColumn": "A First column value",
       "secondColumn": "Second column value",
-      "thridColumn": "Thrid column value"
+      "thirdColumn": "Third column value"
     },
     {
       "id": 02,
       "firstColumn": "B First column value",
       "secondColumn": "Second column value",
-      "thridColumn": "Thrid column value"
+      "thirdColumn": "Third column value"
     },
   ];
 }
