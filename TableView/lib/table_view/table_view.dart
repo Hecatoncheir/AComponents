@@ -57,10 +57,6 @@ class TableView {
     return columns[index];
   }
 
-  Map<String, dynamic> rowTrack(int index, dynamic item) {
-    return rows[index];
-  }
-
   List<Map<String, dynamic>> _rows;
   List<Map<String, dynamic>> get rows => _rows;
 
@@ -159,5 +155,9 @@ class TableView {
     }
 
     _rows = updatedRows;
+  }
+
+  Map<String, dynamic> rowTrack(int index, dynamic item) {
+    return rows[index];
   }
 }
