@@ -37,10 +37,21 @@
                     </template>
                 </template>
 
-                <span>{{column['name']}}</span>
+                <template [ngIf]="column['filterable']==true">
+                    <material-input *ngIf="column['filter']!=null || column['filter'].isNotEmpty"
+                                    [floatingLabel]="true"
+                                    [(value)]="column['filter']"
+                                    label="{{column['name']}}"></material-input>
 
-                <!--<material-input [floatingLabel]="true"-->
-                <!--label="{{column['name']}}"></material-input>-->
+                    <material-input *ngIf="column['filter']==null || column['filter'].isEmpty"
+                                    [floatingLabel]="true"
+                                    label="{{column['name']}}"></material-input>
+                </template>
+
+                <template [ngIf]="column['filterable']==null || column['filterable']==false">
+                    <material-input disabled
+                                    label="{{column['name']}}"></material-input>
+                </template>
             </th>
         </template>
     </tr>

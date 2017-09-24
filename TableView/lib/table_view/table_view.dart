@@ -43,8 +43,15 @@ import 'package:angular_components/angular_components.dart';
       'rows'
     ])
 class TableView {
-  @Input()
-  List<Map<String, dynamic>> columns;
+  List<Map<String, String>> filterFields = new List<Map<String, String>>();
+
+  List<Map<String, dynamic>> _columns;
+  List<Map<String, dynamic>> get columns => _columns;
+
+  @Input('columns')
+  void set columns(List<Map<String, dynamic>> columnsList) {
+    _columns = columnsList;
+  }
 
   Map<String, dynamic> columnTrack(int index, dynamic item) {
     return columns[index];
@@ -116,7 +123,7 @@ class TableView {
       int columnIndex, String newSortType) async {
     Map<String, dynamic> columnOfChangingSort = columns[columnIndex];
 
-    columns.forEach((Map<String, dynamic> column) async {
+    for (Map<String, dynamic> column in columns) {
       /// Other sorting must be disabled for now
       if (column != columnOfChangingSort && column['sortable'] == true) {
         column['sort'] = null;
@@ -125,13 +132,14 @@ class TableView {
       if (column == columnOfChangingSort) {
         column['sort'] = newSortType;
       }
-    });
+    }
 
     List<Map<String, String>> fieldsWithSortingTypes =
         getFieldsForSorting(columns);
 
     List<Map<String, dynamic>> sortedRows =
         sortRows(rows, fieldsWithSortingTypes);
+
     rows = sortedRows;
   }
 

@@ -29,6 +29,7 @@ class TableViewSimpleExample {
       "name": "First column",
       "field": "firstColumn",
       "sortable": true,
+      "filterable": true,
       "filter": 'B first',
     },
     {
