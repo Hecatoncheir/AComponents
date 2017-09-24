@@ -30,7 +30,7 @@ class TableViewSimpleExample {
       "field": "firstColumn",
       "sortable": true,
       "filterable": true,
-      "filter": 'B first',
+      "filter": "b first"
     },
     {
       "id": 02,
@@ -43,7 +43,7 @@ class TableViewSimpleExample {
   List<Map<String, dynamic>> rows = <Map<String, dynamic>>[
     {
       "id": 01,
-      "firstColumn": "A First column value",
+      "firstColumn": "A First column value example",
       "secondColumn": "Second column value",
       "thirdColumn": "Third column value"
     },

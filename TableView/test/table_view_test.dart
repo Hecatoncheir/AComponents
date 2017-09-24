@@ -39,7 +39,7 @@ List<Map<String, dynamic>> rows;
 List<Map<String, dynamic>> _rows = <Map<String, dynamic>>[
   {
     "id": 01,
-    "firstColumn": "A First column value",
+    "firstColumn": "A First column value example",
     "secondColumn": "Second column value",
     "thirdColumn": "Third column value"
   },
@@ -187,7 +187,7 @@ void main() {
       columnsWithSecondColumnFilterValue[0]['sortable'] = false;
       columnsWithSecondColumnFilterValue[0]['hidden'] = true;
       columnsWithSecondColumnFilterValue[1]['filterable'] = true;
-      columnsWithSecondColumnFilterValue[1]['filter'] = 'B first';
+      columnsWithSecondColumnFilterValue[1]['filter'] = 'b first';
 
       fixture.update((TableView tableView) {
         tableView

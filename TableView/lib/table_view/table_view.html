@@ -38,14 +38,16 @@
                 </template>
 
                 <template [ngIf]="column['filterable']==true">
-                    <material-input *ngIf="column['filter']!=null || column['filter'].isNotEmpty"
-                                    [floatingLabel]="true"
-                                    [(value)]="column['filter']"
+                    <!--<material-input *ngIf="column['filter']!=null && column['filter'].toString().isNotEmpty"-->
+                    <material-input [floatingLabel]="true"
+                                    (keyup)="filterForFieldChanged($event, column)"
+                                    [hintText]="column['filter']"
                                     label="{{column['name']}}"></material-input>
 
-                    <material-input *ngIf="column['filter']==null || column['filter'].isEmpty"
-                                    [floatingLabel]="true"
-                                    label="{{column['name']}}"></material-input>
+                    <!--<material-input *ngIf="column['filter']==null || column['filter'].toString().isEmpty"-->
+                    <!--[floatingLabel]="true"-->
+                    <!--(keyup)="filterForFieldChanged($event, column)"-->
+                    <!--label="{{column['name']}}"></material-input>-->
                 </template>
 
                 <template [ngIf]="column['filterable']==null || column['filterable']==false">
@@ -58,14 +60,16 @@
     </thead>
 
     <tbody>
-    <tr *ngFor="let row of rows; let index=index; let odd=odd;">
-        <template ngFor let-column [ngForOf]="columns" let-index="index"
-                  [ngForTrackBy]="columnTrack"
-                  [ngForTrackBy]="rowTrack">
-            <td *ngIf="column['hidden'] == null || column['hidden'] == false"
-                class="mdl-data-table__cell--non-numeric">{{row[column['field']]}}
-            </td>
-        </template>
-    </tr>
+    <template ngFor let-row [ngForOf]="rows" let-index="index" let-odd="odd" [ngForTrackBy]="rowTrack">
+        <tr *ngIf="row['_hidden'] == null || row['_hidden'] == false">
+            <template ngFor let-column [ngForOf]="columns" let-index="index"
+                      [ngForTrackBy]="columnTrack"
+                      [ngForTrackBy]="rowTrack">
+                <td *ngIf="column['hidden'] == null || column['hidden'] == false"
+                    class="mdl-data-table__cell--non-numeric">{{row[column['field']]}}
+                </td>
+            </template>
+        </tr>
+    </template>
     </tbody>
 </table>
