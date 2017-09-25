@@ -38,16 +38,10 @@
                 </template>
 
                 <template [ngIf]="column['filterable']==true">
-                    <!--<material-input *ngIf="column['filter']!=null && column['filter'].toString().isNotEmpty"-->
                     <material-input [floatingLabel]="true"
                                     (keyup)="filterForFieldChanged($event, column)"
                                     [hintText]="column['filter']"
                                     label="{{column['name']}}"></material-input>
-
-                    <!--<material-input *ngIf="column['filter']==null || column['filter'].toString().isEmpty"-->
-                    <!--[floatingLabel]="true"-->
-                    <!--(keyup)="filterForFieldChanged($event, column)"-->
-                    <!--label="{{column['name']}}"></material-input>-->
                 </template>
 
                 <template [ngIf]="column['filterable']==null || column['filterable']==false">

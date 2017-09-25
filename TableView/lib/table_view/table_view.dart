@@ -99,16 +99,30 @@ class TableView {
   List<Map<String, dynamic>> filteringRows(List<Map<String, String>> rows,
       List<Map<String, String>> fieldsForFiltering) {
     for (Map<String, dynamic> row in rows) {
+      List<bool> filteringRowsFieldsResult = new List<bool>();
+
       for (Map<String, dynamic> filteredField in fieldsForFiltering) {
         row['_hidden'] = false;
         dynamic filteredValue = filteredField['filterValue'];
-        if (!row[filteredField['fieldName']]
-            .toString()
-            .toLowerCase()
-            .contains(filteredValue.toString().toLowerCase())) {
-          row['_hidden'] = true;
+
+        switch (filteredValue.runtimeType) {
+          case String:
+            if (!row[filteredField['fieldName']]
+                .toString()
+                .toLowerCase()
+                .contains(filteredValue.toString().toLowerCase())) {
+              filteringRowsFieldsResult.add(false);
+            }
+            break;
+
+          case int:
+            if (!row[filteredField['fieldName']] != filteredValue)
+              filteringRowsFieldsResult.add(false);
+            break;
         }
       }
+
+      if (filteringRowsFieldsResult.contains(false)) row['_hidden'] = true;
     }
 
     return rows;

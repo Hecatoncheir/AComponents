@@ -22,7 +22,9 @@ class TableViewSimpleExample {
       "field": "id",
       "sortable": false,
       "sort": "asc",
-      "hidden": true
+      "hidden": false,
+      "filterable": true,
+      "filter": '2' // int didn't support now
     },
     {
       "id": 01,
