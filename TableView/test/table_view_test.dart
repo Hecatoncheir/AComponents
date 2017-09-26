@@ -197,6 +197,15 @@ void main() {
 
       testedTableView = await fixture.resolvePageObject(TestedTableView);
       expect(await testedTableView.firstRow, equals('B First column value'));
+
+      fixture.update((TableView tableView) {
+        tableView
+          ..columns[1]['filter'] = 'example'
+          ..rows = rows;
+      });
+
+      testedTableView = await fixture.resolvePageObject(TestedTableView);
+      expect(await testedTableView.firstRow, equals('A First column value example'));
     });
   });
 }
