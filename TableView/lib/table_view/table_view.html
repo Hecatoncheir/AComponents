@@ -38,10 +38,21 @@
                 </template>
 
                 <template [ngIf]="column['filterable']==true">
-                    <material-input [floatingLabel]="true"
-                                    (keyup)="filterForFieldChanged($event, column)"
-                                    [hintText]="column['filter']"
-                                    label="{{column['name']}}"></material-input>
+                    <span [ngSwitch]="column['type']">
+                            <material-input *ngSwitchCase="'int'"
+                                            [type]="'number'"
+                                            [checkInteger]
+                                            [floatingLabel]="true"
+                                            (keyup)="filterForFieldChanged($event, column)"
+                                            [hintText]="column['filter'].toString()"
+                                            label="{{column['name']}}"></material-input>
+
+                            <material-input *ngSwitchDefault
+                                            [floatingLabel]="true"
+                                            (keyup)="filterForFieldChanged($event, column)"
+                                            [hintText]="column['filter'].toString()"
+                                            label="{{column['name']}}"></material-input>
+                    </span>
                 </template>
 
                 <template [ngIf]="column['filterable']==null || column['filterable']==false">

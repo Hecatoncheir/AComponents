@@ -5,6 +5,10 @@ import 'package:table_view/components.dart';
 @Component(
     selector: 'table-view-simple-example',
     template: """
+      {{columns}}
+      <br>
+      {{rows}}
+      <br>
       <material-checkbox
           [(checked)]="columns.first['hidden']"
           label="Is Row Id column must be hidden?">
@@ -20,11 +24,12 @@ class TableViewSimpleExample {
       "id": 0,
       "name": "Row Id",
       "field": "id",
-      "sortable": false,
+      "sortable": true,
       "sort": "asc",
       "hidden": false,
       "filterable": true,
-      "filter": '2' // int didn't support now
+      "type": 'int',
+      "filter": 2
     },
     {
       "id": 01,
@@ -32,6 +37,7 @@ class TableViewSimpleExample {
       "field": "firstColumn",
       "sortable": true,
       "filterable": true,
+      "type": 'String',
       "filter": "b first"
     },
     {

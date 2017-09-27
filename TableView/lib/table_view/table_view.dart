@@ -33,6 +33,9 @@ import 'package:angular_components/angular_components.dart';
     directives: const [
       NgFor,
       NgIf,
+      NgSwitch,
+      NgSwitchWhen,
+      NgSwitchDefault,
       MaterialInputComponent,
       MaterialButtonComponent,
       MaterialIconComponent
@@ -75,7 +78,7 @@ class TableView {
   List<Map<String, dynamic>> get rows => _rows;
 
   /// Parsing 'filter' field of columns for make structure like:
-  /// [{'fieldName':'id', 'filterValue': 'some text'}, {'fieldName':'name', 'filterValue': 'some text'}]
+  /// [{'fieldName':'id', 'filterValue': 'some text', 'type': int}, {'fieldName':'name', 'filterValue': 'some text'}]
   List<Map<String, String>> getFieldsForFiltering(
       List<Map<String, String>> columns) {
     List<Map<String, dynamic>> filterFields = new List<Map<String, dynamic>>();
@@ -87,7 +90,8 @@ class TableView {
 
         filterFields.add(<String, dynamic>{
           'fieldName': column['field'],
-          'filterValue': column['filter']
+          'filterValue': column['filter'],
+          'type': column['type'] == null ? 'String' : column['type']
         });
       }
     }
@@ -96,8 +100,9 @@ class TableView {
   }
 
   /// Method for sorting rows by 'sort' property for field in column
-  List<Map<String, dynamic>> filteringRows(List<Map<String, String>> rows,
-      List<Map<String, String>> fieldsForFiltering) {
+  Future<List<Map<String, dynamic>>> filteringRows(
+      List<Map<String, String>> rows,
+      List<Map<String, String>> fieldsForFiltering) async {
     for (Map<String, dynamic> row in rows) {
       List<bool> filteringRowsFieldsResult = new List<bool>();
 
@@ -105,8 +110,8 @@ class TableView {
         row['_hidden'] = false;
         dynamic filteredValue = filteredField['filterValue'];
 
-        switch (filteredValue.runtimeType) {
-          case String:
+        switch (filteredField['type']) {
+          case 'String':
             if (!row[filteredField['fieldName']]
                 .toString()
                 .toLowerCase()
@@ -115,9 +120,21 @@ class TableView {
             }
             break;
 
-          case int:
-            if (!row[filteredField['fieldName']] != filteredValue)
-              filteringRowsFieldsResult.add(false);
+          case 'int':
+            if (filteredValue != null) {
+              if (row[filteredField['fieldName']].runtimeType != int) {
+                row[filteredField['fieldName']] =
+                    int.parse(row[filteredField['fieldName']].toString());
+              }
+
+              if (filteredValue.runtimeType != int &&
+                  filteredValue.toString().isNotEmpty) {
+                filteredValue = int.parse(filteredValue.toString());
+              }
+
+              if (row[filteredField['fieldName']] != filteredValue)
+                filteringRowsFieldsResult.add(false);
+            }
             break;
         }
       }
@@ -219,7 +236,7 @@ class TableView {
       /// Filtering rows first
       if (filterFields.isNotEmpty) {
         List<Map<String, dynamic>> filteredRows =
-            filteringRows(updatedRows, filterFields);
+            await filteringRows(updatedRows, filterFields);
         updatedRows = filteredRows;
       }
 
