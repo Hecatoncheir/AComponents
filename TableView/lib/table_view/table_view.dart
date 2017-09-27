@@ -122,6 +122,9 @@ class TableView {
 
           case 'int':
             if (filteredValue != null) {
+              if (filteredValue.runtimeType != int &&
+                  filteredValue.toString().isEmpty) break;
+
               if (row[filteredField['fieldName']].runtimeType != int) {
                 row[filteredField['fieldName']] =
                     int.parse(row[filteredField['fieldName']].toString());
