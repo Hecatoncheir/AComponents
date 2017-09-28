@@ -2,26 +2,26 @@
     <thead>
     <tr>
         <template ngFor let-column [ngForOf]="columns" let-index="index" [ngForTrackBy]="columnTrack">
-            <th *ngIf="column['hidden'] == null || column['hidden'] == false"
+            <th *ngIf="column.hidden== null || column.hidden == false"
                 class="mdl-data-table__cell--non-numeric">
-                <template [ngIf]="column['sortable']==true">
-                    <template [ngIf]="column['sort']!=null && column['sort'].isNotEmpty">
+                <template [ngIf]="column.sortable==true">
+                    <template [ngIf]="column.sort!=null && column.sort.isNotEmpty">
                         <material-button icon
                                          (click)="changeSortTypeOfColumn(index,'desc')"
-                                         *ngIf="column['sort']=='asc'">
+                                         *ngIf="column.sort=='asc'">
                             <material-icon size="small"
                                            icon="arrow_upward"></material-icon>
                         </material-button>
 
                         <material-button icon
                                          (click)="changeSortTypeOfColumn(index,'asc')"
-                                         *ngIf="column['sort']!='asc'">
+                                         *ngIf="column.sort!='asc'">
                             <material-icon size="small"
                                            icon="arrow_downward"></material-icon>
                         </material-button>
                     </template>
 
-                    <template [ngIf]="column['sort']==null || column['sort'].isEmpty">
+                    <template [ngIf]="column.sort==null || column.sort.isEmpty">
                         <material-button icon
                                          (click)="changeSortTypeOfColumn(index,'desc')">
                             <material-icon size="small"
@@ -38,26 +38,26 @@
                 </template>
 
                 <template [ngIf]="column.filterable==true">
-                    <span [ngSwitch]="column['type']">
+                    <span [ngSwitch]="column.type">
                             <material-input *ngSwitchCase="'int'"
                                             [type]="'number'"
                                             [checkInteger]
                                             [floatingLabel]="true"
                                             (keyup)="filterForFieldChanged($event, column)"
-                                            [hintText]="column['filter'].toString()"
-                                            label="{{column['name']}}"></material-input>
+                                            [hintText]="column.filter.toString()"
+                                            label="{{column.name}}"></material-input>
 
                             <material-input *ngSwitchDefault
                                             [floatingLabel]="true"
                                             (keyup)="filterForFieldChanged($event, column)"
-                                            [hintText]="column['filter'].toString()"
-                                            label="{{column['name']}}"></material-input>
+                                            [hintText]="column.filter.toString()"
+                                            label="{{column.name}}"></material-input>
                     </span>
                 </template>
 
-                <template [ngIf]="column['filterable']==null || column['filterable']==false">
+                <template [ngIf]="column.filterable==null || column.filterable==false">
                     <material-input disabled
-                                    label="{{column['name']}}"></material-input>
+                                    label="{{column.name}}"></material-input>
                 </template>
             </th>
         </template>
@@ -66,11 +66,11 @@
 
     <tbody>
     <template ngFor let-row [ngForOf]="rows" let-index="index" let-odd="odd" [ngForTrackBy]="rowTrack">
-        <tr *ngIf="row['_hidden'] == null || row['_hidden'] == false">
+        <tr *ngIf="row.hidden == null || row.hidden == false">
             <template ngFor let-column [ngForOf]="columns" let-index="index"
                       [ngForTrackBy]="columnTrack"
                       [ngForTrackBy]="rowTrack">
-                <td *ngIf="column['hidden'] == null || column['hidden'] == false"
+                <td *ngIf="column.hidden == null || column.hidden == false"
                     class="mdl-data-table__cell--non-numeric">{{row[column['field']]}}
                 </td>
             </template>

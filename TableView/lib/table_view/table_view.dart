@@ -174,6 +174,7 @@ class TableView {
                 } catch (err) {
                   print(err);
                   print('Value must be a number');
+                  break;
                 }
               }
 
