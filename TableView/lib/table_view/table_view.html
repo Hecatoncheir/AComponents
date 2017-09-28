@@ -37,7 +37,7 @@
                     </template>
                 </template>
 
-                <template [ngIf]="column['filterable']==true">
+                <template [ngIf]="column.filterable==true">
                     <span [ngSwitch]="column['type']">
                             <material-input *ngSwitchCase="'int'"
                                             [type]="'number'"

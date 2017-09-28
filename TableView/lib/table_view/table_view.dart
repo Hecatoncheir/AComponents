@@ -6,9 +6,11 @@ import 'dart:html';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 
+import 'package:table_view/entities.dart';
+
 //List<Map<String, dynamic>> columns = <Map<String, dynamic>>[
 //{"id": 0, "name": "Row Id", "field": "id", "sortable": true, "sort": "asc", "hidden": false},
-//{"id": 01, "name": "First column", "field": "firstColumn","filterable":true, "filter":'some text'},
+//{"id": 01, "name": "First column", "field": "firstColumn", "type":"String", "filterable":true, "filter":'some text'},
 //{"id": 02, "name": "Second column", "field": "secondColumn"},
 //{"id": 03, "name": "Third column", "field": "thirdColumn"}
 //];
@@ -48,17 +50,54 @@ import 'package:angular_components/angular_components.dart';
       'rows'
     ])
 class TableView {
-  List<Map<String, dynamic>> _columns;
+  final List<Column> _columns = new List<Column>();
 
-  List<Map<String, dynamic>> get columns => _columns;
+  List<Column> get columns => _columns;
 
   @Input('columns')
   void set columns(List<Map<String, dynamic>> columnsList) {
-    _columns = columnsList;
+    for (Map<String, dynamic> column in columnsList) {
+      _columns.add(new Column(
+          id: column['id'],
+          name: column['name'],
+          field: column['field'],
+          sort: column['sort'],
+          type: column['type'],
+          filter: column['filter'],
+          filterable: column['filterable'],
+          sortable: column['sortable'],
+          hidden: column['hidden']));
+    }
   }
 
   Map<String, dynamic> columnTrack(int index, dynamic item) {
     return columns[index];
+  }
+
+  List<Row> _rows = new List<Row>();
+
+  List<Row> get rows => _rows;
+
+  /// All operations is mutable
+  @Input('rows')
+  void set rows(List<Map<String, dynamic>> rowsList) {
+    for (Map<String, dynamic> row in rowsList) {
+      Row _row = new Row(id: row['id'], hidden: row['_hidden']);
+
+      for (String key in row.keys) {
+        _row[key] = row[key];
+      }
+
+      _rows.add(_row);
+    }
+
+    updateRows(columns, _rows).then((List<Row> updatedRows) {
+      _rows = updatedRows;
+    });
+  }
+
+  Row rowTrack(int index, dynamic item) {
+    return rows[index];
   }
 
   /// Call when enter was pressed on column filter input
@@ -68,19 +107,14 @@ class TableView {
     int indexOfFilterUpdatedColumn = columns.indexOf(column);
     columns[indexOfFilterUpdatedColumn]['filter'] = input.value;
 
-    updateRows(columns, _rows).then((List<Map<String, dynamic>> updatedRows) {
+    updateRows(columns, _rows).then((List<Row> updatedRows) {
       _rows = updatedRows;
     });
   }
 
-  List<Map<String, dynamic>> _rows;
-
-  List<Map<String, dynamic>> get rows => _rows;
-
   /// Parsing 'filter' field of columns for make structure like:
   /// [{'fieldName':'id', 'filterValue': 'some text', 'type': int}, {'fieldName':'name', 'filterValue': 'some text'}]
-  List<Map<String, String>> getFieldsForFiltering(
-      List<Map<String, String>> columns) {
+  List<Map<String, String>> getFieldsForFiltering(List<Column> columns) {
     List<Map<String, dynamic>> filterFields = new List<Map<String, dynamic>>();
 
     for (Map<String, dynamic> column in columns) {
@@ -100,10 +134,9 @@ class TableView {
   }
 
   /// Method for sorting rows by 'sort' property for field in column
-  Future<List<Map<String, dynamic>>> filteringRows(
-      List<Map<String, String>> rows,
-      List<Map<String, String>> fieldsForFiltering) async {
-    for (Map<String, dynamic> row in rows) {
+  Future<List<Row>> filteringRows(
+      List<Row> rows, List<Map<String, dynamic>> fieldsForFiltering) async {
+    for (Row row in rows) {
       List<bool> filteringRowsFieldsResult = new List<bool>();
 
       for (Map<String, dynamic> filteredField in fieldsForFiltering) {
@@ -126,13 +159,22 @@ class TableView {
                   filteredValue.toString().isEmpty) break;
 
               if (row[filteredField['fieldName']].runtimeType != int) {
-                row[filteredField['fieldName']] =
-                    int.parse(row[filteredField['fieldName']].toString());
+                try {
+                  row[filteredField['fieldName']] =
+                      int.parse(row[filteredField['fieldName']].toString());
+                } catch (err) {
+                  print(err);
+                }
               }
 
               if (filteredValue.runtimeType != int &&
                   filteredValue.toString().isNotEmpty) {
-                filteredValue = int.parse(filteredValue.toString());
+                try {
+                  filteredValue = int.parse(filteredValue.toString());
+                } catch (err) {
+                  print(err);
+                  print('Value must be a number');
+                }
               }
 
               if (row[filteredField['fieldName']] != filteredValue)
@@ -150,8 +192,7 @@ class TableView {
 
   /// Parsing 'sort' field of columns for make structure like:
   /// [{'fieldName':'id', 'sortType': 'asc'}, {'fieldName':'name', 'sortType': 'desc'}]
-  List<Map<String, String>> getFieldsForSorting(
-      List<Map<String, String>> columns) {
+  List<Map<String, String>> getFieldsForSorting(List<Column> columns) {
     List<Map<String, String>> fieldsWithSortingTypes =
         new List<Map<String, String>>();
 
@@ -175,8 +216,8 @@ class TableView {
   }
 
   /// Method for sorting rows by 'sort' property for field in column
-  List<Map<String, dynamic>> sortRows(List<Map<String, String>> rows,
-      List<Map<String, String>> fieldsForSorting) {
+  List<Row> sortRows(
+      List<Row> rows, List<Map<String, String>> fieldsForSorting) {
     for (Map<String, String> sortingField in fieldsForSorting) {
       String sortType = sortingField['sortType'];
       String sortedField = sortingField['fieldName'];
@@ -205,32 +246,25 @@ class TableView {
 
   Future<Null> changeSortTypeOfColumn(
       int columnIndex, String newSortType) async {
-    Map<String, dynamic> columnOfChangingSort = columns[columnIndex];
+    Column columnOfChangingSort = columns[columnIndex];
 
-    for (Map<String, dynamic> column in columns) {
+    for (Column column in columns) {
       /// Other sorting must be disabled for now
-      if (column != columnOfChangingSort && column['sortable'] == true) {
-        column['sort'] = null;
+      if (column != columnOfChangingSort && column.sortable == true) {
+        column.sort = null;
       }
 
       if (column == columnOfChangingSort) {
-        column['sort'] = newSortType;
+        column.sort = newSortType;
       }
     }
 
-    List<Map<String, String>> fieldsWithSortingTypes =
-        getFieldsForSorting(columns);
-
-    List<Map<String, dynamic>> sortedRows =
-        sortRows(rows, fieldsWithSortingTypes);
-
-    rows = sortedRows;
+    updateRows(columns, rows).then((List<Row> rows) => _rows = rows);
   }
 
-  Future<List<Map<String, dynamic>>> updateRows(
-      List<Map<String, dynamic>> columnList,
-      List<Map<String, dynamic>> rowsList) async {
-    List<Map<String, dynamic>> updatedRows = rowsList;
+  Future<List<Row>> updateRows(
+      List<Column> columnList, List<Row> rowsList) async {
+    List<Row> updatedRows = rowsList;
 
     /// If columns is not null rows can be sorted
     if (columns != null) {
@@ -238,8 +272,7 @@ class TableView {
 
       /// Filtering rows first
       if (filterFields.isNotEmpty) {
-        List<Map<String, dynamic>> filteredRows =
-            await filteringRows(updatedRows, filterFields);
+        List<Row> filteredRows = await filteringRows(updatedRows, filterFields);
         updatedRows = filteredRows;
       }
 
@@ -248,25 +281,11 @@ class TableView {
 
       /// Sorting after filtering
       if (fieldsWithSortingTypes.isNotEmpty) {
-        List<Map<String, dynamic>> sortedRows =
-            sortRows(updatedRows, fieldsWithSortingTypes);
+        List<Row> sortedRows = sortRows(updatedRows, fieldsWithSortingTypes);
         updatedRows = sortedRows;
       }
     }
 
     return updatedRows;
-  }
-
-  /// All operations is mutable
-  @Input('rows')
-  void set rows(List<Map<String, dynamic>> rowsList) {
-    updateRows(columns, rowsList)
-        .then((List<Map<String, dynamic>> updatedRows) {
-      _rows = updatedRows;
-    });
-  }
-
-  Map<String, dynamic> rowTrack(int index, dynamic item) {
-    return rows[index];
   }
 }
