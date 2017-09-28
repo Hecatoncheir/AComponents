@@ -9,9 +9,8 @@ import 'package:test/test.dart';
 
 import 'package:table_view/table_view/table_view.dart';
 
-List<Map<String, dynamic>> columns;
-List<Map<String, dynamic>> _columns = <Map<String, dynamic>>[
-  {
+const List<Map<String, dynamic>> columns = const <Map<String, dynamic>>[
+  const {
     "id": 0,
     "name": "Row Id",
     "field": "id",
@@ -19,7 +18,7 @@ List<Map<String, dynamic>> _columns = <Map<String, dynamic>>[
     "sort": "asc",
     "hidden": false
   },
-  {
+  const {
     "id": 01,
     "name": "First column",
     "field": "firstColumn",
@@ -27,23 +26,22 @@ List<Map<String, dynamic>> _columns = <Map<String, dynamic>>[
     "filtered": true,
     "filter": null,
   },
-  {
+  const {
     "id": 02,
     "name": "Second column",
     "field": "secondColumn",
   },
-  {"id": 03, "name": "Third column", "field": "thirdColumn"}
+  const {"id": 03, "name": "Third column", "field": "thirdColumn"}
 ];
 
-List<Map<String, dynamic>> rows;
-List<Map<String, dynamic>> _rows = <Map<String, dynamic>>[
-  {
+const List<Map<String, dynamic>> rows = const <Map<String, dynamic>>[
+  const {
     "id": 01,
     "firstColumn": "A First column value example",
     "secondColumn": "Second column value",
     "thirdColumn": "Third column value"
   },
-  {
+  const {
     "id": 02,
     "firstColumn": "B First column value",
     "secondColumn": "Second column value",
@@ -90,12 +88,6 @@ void main() {
   });
 
   tearDownAll(disposeAnyRunningTest);
-
-  /// Because operations in TableView component a mutable a columns and rows
-  setUp(() {
-    columns = new List.from(_columns);
-    rows = new List.from(_rows);
-  });
 
   tearDown(() async {
     fixture.update((TableView tableView) {
@@ -205,7 +197,8 @@ void main() {
       });
 
       testedTableView = await fixture.resolvePageObject(TestedTableView);
-      expect(await testedTableView.firstRow, equals('A First column value example'));
+      expect(await testedTableView.firstRow,
+          equals('A First column value example'));
     });
   });
 }
