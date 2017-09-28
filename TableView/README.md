@@ -42,3 +42,5 @@ class TableViewSimpleExample {
 ```
 
 See simple example.
+
+![preview](https://raw.githubusercontent.com/Rasarts/AComponents/table_view/TableView/preview/table_view_preview.gif)
