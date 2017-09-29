@@ -89,11 +89,17 @@ void main() {
 
   tearDownAll(disposeAnyRunningTest);
 
-  tearDown(() async {
+  setUp(() async {
     fixture.update((TableView tableView) {
       tableView
-        ..columns = null
-        ..rows = null;
+        ..columns = columns
+        ..rows = rows;
+    });
+  });
+
+  tearDown(() async {
+    fixture.update((TableView tableView) {
+      tableView..columns.clear()..rows.clear();
     });
 
     testedTableView = await fixture.resolvePageObject(TestedTableView);
@@ -117,14 +123,8 @@ void main() {
 
   group('Column', () {
     test('can be hidden', () async {
-      List<Map<String, dynamic>> updatedWithHiddenColumn =
-          new List.from(columns);
-      updatedWithHiddenColumn.first['hidden'] = true;
-
       fixture.update((TableView tableView) {
-        tableView
-          ..columns = updatedWithHiddenColumn
-          ..rows = rows;
+        tableView.columns.first.hidden = true;
       });
 
       testedTableView = await fixture.resolvePageObject(TestedTableView);
@@ -141,14 +141,9 @@ void main() {
     });
 
     test('can be ascending sorted', () async {
-      List<Map<String, dynamic>> withAscendingSortedColumn =
-          new List.from(columns);
-      withAscendingSortedColumn.first['sort'] = 'asc';
-
       fixture.update((TableView tableView) {
-        tableView
-          ..columns = withAscendingSortedColumn
-          ..rows = rows;
+        tableView.columns.first.sort = 'asc';
+        tableView.rows = rows;
       });
 
       testedTableView = await fixture.resolvePageObject(TestedTableView);
@@ -156,14 +151,9 @@ void main() {
     });
 
     test('can be descending sorted', () async {
-      List<Map<String, dynamic>> updatedWithDescendingSortedColumn =
-          new List.from(columns);
-      updatedWithDescendingSortedColumn.first['sort'] = 'desc';
-
       fixture.update((TableView tableView) {
-        tableView
-          ..columns = updatedWithDescendingSortedColumn
-          ..rows = rows;
+        tableView.columns.first.sort = 'desc';
+        tableView.rows = rows;
       });
 
       testedTableView = await fixture.resolvePageObject(TestedTableView);
@@ -174,26 +164,21 @@ void main() {
 
   group('Rows', () {
     test('can be filtered', () async {
-      List<Map<String, dynamic>> columnsWithSecondColumnFilterValue =
-          new List.from(columns);
-      columnsWithSecondColumnFilterValue[0]['sortable'] = false;
-      columnsWithSecondColumnFilterValue[0]['hidden'] = true;
-      columnsWithSecondColumnFilterValue[1]['filterable'] = true;
-      columnsWithSecondColumnFilterValue[1]['filter'] = 'b first';
-
       fixture.update((TableView tableView) {
         tableView
-          ..columns = columnsWithSecondColumnFilterValue
-          ..rows = rows;
+          ..columns[0].sortable = false
+          ..columns[0].hidden = true
+          ..columns[1].filterable = true
+          ..columns[1].filter = 'b first';
+        tableView.rows = rows;
       });
 
       testedTableView = await fixture.resolvePageObject(TestedTableView);
       expect(await testedTableView.firstRow, equals('B First column value'));
 
       fixture.update((TableView tableView) {
-        tableView
-          ..columns[1]['filter'] = 'example'
-          ..rows = rows;
+        tableView.columns[1].filter = 'example';
+        tableView.rows = rows;
       });
 
       testedTableView = await fixture.resolvePageObject(TestedTableView);
