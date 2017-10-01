@@ -44,17 +44,18 @@ import 'package:table_view/entities.dart';
     ],
     providers: const [materialProviders],
     inputs: const <String>['columns', 'rows'],
-    changeDetection: ChangeDetectionStrategy.OnPush)
+    changeDetection: ChangeDetectionStrategy.Default)
 class TableView extends DoCheck {
   List<Map<String, dynamic>> _originalColumns =
       new List<Map<String, dynamic>>();
 
-  final List<Column> _columns = new List<Column>();
-  List<Column> get columns => _columns;
+  Columns<Column> _columns;
+  Columns<Column> get columns => _columns;
 
   @Input('columns')
   void set columns(List<Map<String, dynamic>> columnsList) {
-    _originalColumns = columnsList;
+    _originalColumns = new List.from(columnsList);
+    _columns = new Columns<Column>();
 
     for (Map<String, dynamic> column in columnsList) {
       _columns.add(new Column(
@@ -70,18 +71,19 @@ class TableView extends DoCheck {
     }
   }
 
-  Map<String, dynamic> columnTrack(int index, dynamic item) {
+  Column columnTrack(int index, dynamic item) {
     return columns[index];
   }
 
   List<Map<String, dynamic>> _originalRows = new List<Map<String, dynamic>>();
-  Rows<Row> _rows = new Rows<Row>();
+  Rows<Row> _rows;
   Rows<Row> get rows => _rows;
 
   /// All operations is mutable
   @Input('rows')
   void set rows(List<Map<String, dynamic>> rowsList) {
     _originalRows = rowsList;
+    _rows = new Rows<Row>();
 
     for (Map<String, dynamic> row in rowsList) {
       Row _row = new Row(id: row['id'], hidden: row['_hidden']);
@@ -93,7 +95,7 @@ class TableView extends DoCheck {
       _rows.add(_row);
     }
 
-    updateRows(columns, _rows).then((List<Row> updatedRows) {
+    updateRows(_columns, _rows).then((List<Row> updatedRows) {
       _rows = updatedRows;
     });
   }
@@ -103,30 +105,45 @@ class TableView extends DoCheck {
   }
 
   void ngDoCheck() {
-    if (!_rows.equals(_originalRows)) {
-      print("Rows changed");
-      _originalRows = _rows;
+    if (!_columns.equals(_originalColumns)) {
+      for (Column column in _columns) {
+        int index = _columns.indexOf(column);
+        if (column.hidden != _originalColumns[index]['hidden']) {
+          column.hidden = _originalColumns[index]['hidden'];
+        }
+
+        if (_originalColumns[index]['sort'] != null ||
+            _originalColumns[index]['sort'].toString().isNotEmpty) {
+          int sortCompare = column.sort
+              .toString()
+              .compareTo(_originalColumns[index]['sort'].toString());
+
+          if (sortCompare == 0 ? false : true) {
+            changeSortTypeOfColumn(index, _originalColumns[index]['sort']);
+            column.sort = _originalColumns[index]['sort'];
+          }
+        }
+      }
     }
   }
 
   /// Call when enter was pressed on column filter input
-  Future<Null> filterForFieldChanged(
-      KeyboardEvent event, Map<String, dynamic> column) async {
+  Future<Null> filterForFieldChanged(KeyboardEvent event, Column column) async {
     InputElement input = event.target;
-    int indexOfFilterUpdatedColumn = columns.indexOf(column);
-    columns[indexOfFilterUpdatedColumn]['filter'] = input.value;
+    int indexOfFilterUpdatedColumn = _columns.indexOf(column);
+    _columns[indexOfFilterUpdatedColumn]['filter'] = input.value;
 
-    updateRows(columns, _rows).then((List<Row> updatedRows) {
+    updateRows(_columns, _rows).then((List<Row> updatedRows) {
       _rows = updatedRows;
     });
   }
 
   /// Parsing 'filter' field of columns for make structure like:
   /// [{'fieldName':'id', 'filterValue': 'some text', 'type': int}, {'fieldName':'name', 'filterValue': 'some text'}]
-  List<Map<String, String>> getFieldsForFiltering(List<Column> columns) {
+  List<Map<String, String>> getFieldsForFiltering(Columns<Column> columns) {
     List<Map<String, dynamic>> filterFields = new List<Map<String, dynamic>>();
 
-    for (Map<String, dynamic> column in columns) {
+    for (Column column in columns) {
       if (column['filterable'] != null && column['filterable'] == true) {
         if (column['filter'] == null && column['filter'].toString().isEmpty)
           continue;
@@ -143,8 +160,8 @@ class TableView extends DoCheck {
   }
 
   /// Method for sorting rows by 'sort' property for field in column
-  Future<List<Row>> filteringRows(
-      List<Row> rows, List<Map<String, dynamic>> fieldsForFiltering) async {
+  Future<Rows<Row>> filteringRows(
+      Rows<Row> rows, List<Map<String, dynamic>> fieldsForFiltering) async {
     for (Row row in rows) {
       List<bool> filteringRowsFieldsResult = new List<bool>();
 
@@ -226,23 +243,21 @@ class TableView extends DoCheck {
   }
 
   /// Method for sorting rows by 'sort' property for field in column
-  List<Row> sortRows(
-      List<Row> rows, List<Map<String, String>> fieldsForSorting) {
+  Rows<Row> sortRows(
+      Rows<Row> rows, List<Map<String, String>> fieldsForSorting) {
     for (Map<String, String> sortingField in fieldsForSorting) {
       String sortType = sortingField['sortType'];
       String sortedField = sortingField['fieldName'];
 
       if (sortType == 'asc') {
-        rows.sort(
-            (Map<String, dynamic> previewRow, Map<String, dynamic> nextRow) {
+        rows.sort((Row previewRow, Row nextRow) {
           int isAsc = previewRow[sortedField]
               .toString()
               .compareTo(nextRow[sortedField].toString());
           return isAsc;
         });
       } else {
-        rows.sort(
-            (Map<String, dynamic> previewRow, Map<String, dynamic> nextRow) {
+        rows.sort((Row previewRow, Row nextRow) {
           int isDesc = nextRow[sortedField]
               .toString()
               .compareTo(previewRow[sortedField].toString());
@@ -256,25 +271,23 @@ class TableView extends DoCheck {
 
   Future<Null> changeSortTypeOfColumn(
       int columnIndex, String newSortType) async {
-    Column columnOfChangingSort = columns[columnIndex];
+    Column columnOfChangingSort = _columns[columnIndex];
 
-    for (Column column in columns) {
+    for (Column column in _columns) {
       /// Other sorting must be disabled for now
       if (column != columnOfChangingSort && column.sortable == true) {
         column.sort = null;
       }
-
-      if (column == columnOfChangingSort) {
-        column.sort = newSortType;
-      }
     }
 
-    updateRows(columns, rows).then((List<Row> rows) => _rows = rows);
+    columnOfChangingSort.sort = newSortType;
+
+    updateRows(_columns, _rows).then((Rows<Row> rows) => _rows = rows);
   }
 
-  Future<List<Row>> updateRows(
-      List<Column> columnList, List<Row> rowsList) async {
-    List<Row> updatedRows = rowsList;
+  Future<Rows<Row>> updateRows(
+      Columns<Column> columnList, Rows<Row> rowsList) async {
+    Rows<Row> updatedRows = rowsList;
 
     /// If columns is not null rows can be sorted
     if (columns != null) {
@@ -282,7 +295,7 @@ class TableView extends DoCheck {
 
       /// Filtering rows first
       if (filterFields.isNotEmpty) {
-        List<Row> filteredRows = await filteringRows(updatedRows, filterFields);
+        Rows<Row> filteredRows = await filteringRows(updatedRows, filterFields);
         updatedRows = filteredRows;
       }
 
@@ -291,7 +304,7 @@ class TableView extends DoCheck {
 
       /// Sorting after filtering
       if (fieldsWithSortingTypes.isNotEmpty) {
-        List<Row> sortedRows = sortRows(updatedRows, fieldsWithSortingTypes);
+        Rows<Row> sortedRows = sortRows(updatedRows, fieldsWithSortingTypes);
         updatedRows = sortedRows;
       }
     }

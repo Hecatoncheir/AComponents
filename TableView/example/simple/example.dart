@@ -5,14 +5,15 @@ import 'package:table_view/components.dart';
 @Component(
     selector: 'table-view-simple-example',
     template: """
-      {{columns}}
-      <br>
-      {{rows}}
-      <br>
       <material-checkbox
           [(checked)]="columns.first['hidden']"
           label="Is Row Id column must be hidden?">
       </material-checkbox>
+      
+      <material-input
+          (keyup)="columns[0]['sort']=\$event.target.value"
+          label="Change sort of Row Id column">
+      </material-input>
       
       <table-view [columns]='columns' [rows]='rows'></table-view>
     """,

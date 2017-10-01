@@ -2,6 +2,40 @@ library table_view_entities;
 
 import 'dart:collection';
 
+class Columns<Column> extends ListBase<Column> {
+  final List _entitiesList = new List<Column>();
+
+  operator [](int position) {
+    return _entitiesList[position];
+  }
+
+  operator []=(int position, Column value) {
+    _entitiesList[position] = value;
+  }
+
+  int get length => _entitiesList.length;
+  void set length(int newLength) => _entitiesList.length = newLength;
+
+  bool equals(List<Map<String, dynamic>> columnsList) {
+    if (_entitiesList.length != columnsList.length) return false;
+
+    for (Column column in _entitiesList) {
+      int index = _entitiesList.indexOf(column);
+
+      if (_entitiesList[index]['hidden'] != columnsList[index]['hidden'])
+        return false;
+
+      if (_entitiesList[index]['sort'] != columnsList[index]['sort'])
+        return false;
+
+      if (_entitiesList[index]['filter'] != columnsList[index]['filter'])
+        return false;
+    }
+
+    return true;
+  }
+}
+
 class Column extends MapBase<String, dynamic> {
   final Map _entityMap = new Map<String, dynamic>();
 
@@ -87,8 +121,9 @@ class Rows<Row> extends ListBase<Row> {
   int get length => _entitiesList.length;
   void set length(int newLength) => _entitiesList.length = newLength;
 
-  bool equals(List<Map<String,dynamic>> rowsList) {
-    return false;
+  bool equals(List<Map<String, dynamic>> rowsList) {
+    if (_entitiesList.length != rowsList.length) return false;
+    return true;
   }
 }
 
