@@ -42,20 +42,20 @@ import 'package:table_view/entities.dart';
       MaterialButtonComponent,
       MaterialIconComponent
     ],
-    providers: const [
-      materialProviders
-    ],
-    inputs: const <String>[
-      'columns',
-      'rows'
-    ])
-class TableView {
-  final List<Column> _columns = new List<Column>();
+    providers: const [materialProviders],
+    inputs: const <String>['columns', 'rows'],
+    changeDetection: ChangeDetectionStrategy.OnPush)
+class TableView extends DoCheck {
+  List<Map<String, dynamic>> _originalColumns =
+      new List<Map<String, dynamic>>();
 
+  final List<Column> _columns = new List<Column>();
   List<Column> get columns => _columns;
 
   @Input('columns')
   void set columns(List<Map<String, dynamic>> columnsList) {
+    _originalColumns = columnsList;
+
     for (Map<String, dynamic> column in columnsList) {
       _columns.add(new Column(
           id: column['id'],
@@ -74,13 +74,15 @@ class TableView {
     return columns[index];
   }
 
-  List<Row> _rows = new List<Row>();
-
-  List<Row> get rows => _rows;
+  List<Map<String, dynamic>> _originalRows = new List<Map<String, dynamic>>();
+  Rows<Row> _rows = new Rows<Row>();
+  Rows<Row> get rows => _rows;
 
   /// All operations is mutable
   @Input('rows')
   void set rows(List<Map<String, dynamic>> rowsList) {
+    _originalRows = rowsList;
+
     for (Map<String, dynamic> row in rowsList) {
       Row _row = new Row(id: row['id'], hidden: row['_hidden']);
 
@@ -98,6 +100,13 @@ class TableView {
 
   Row rowTrack(int index, dynamic item) {
     return rows[index];
+  }
+
+  void ngDoCheck() {
+    if (!_rows.equals(_originalRows)) {
+      print("Rows changed");
+      _originalRows = _rows;
+    }
   }
 
   /// Call when enter was pressed on column filter input

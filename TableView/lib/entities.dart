@@ -73,6 +73,25 @@ class Column extends MapBase<String, dynamic> {
   }
 }
 
+class Rows<Row> extends ListBase<Row> {
+  final List _entitiesList = new List<Map<String, dynamic>>();
+
+  operator [](int position) {
+    return _entitiesList[position];
+  }
+
+  operator []=(int position, Row value) {
+    _entitiesList[position] = value;
+  }
+
+  int get length => _entitiesList.length;
+  void set length(int newLength) => _entitiesList.length = newLength;
+
+  bool equals(List<Map<String,dynamic>> rowsList) {
+    return false;
+  }
+}
+
 class Row extends MapBase<String, dynamic> {
   final Map _entityMap = new Map<String, dynamic>();
 

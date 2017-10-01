@@ -165,12 +165,13 @@ void main() {
   group('Rows', () {
     test('can be filtered', () async {
       fixture.update((TableView tableView) {
-        tableView
-          ..columns[0].sortable = false
-          ..columns[0].hidden = true
-          ..columns[1].filterable = true
-          ..columns[1].filter = 'b first';
-        tableView.rows = rows;
+        List<Map<String, dynamic>> updatedColumns = new List.from(tableView.columns);
+        updatedColumns[0]['sortable'] = false;
+        updatedColumns[0]['hidden'] = true;
+        updatedColumns[1]['filterable'] = true;
+        updatedColumns[1]['filter'] = 'b first';
+
+        tableView.columns = updatedColumns;
       });
 
       testedTableView = await fixture.resolvePageObject(TestedTableView);
