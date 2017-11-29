@@ -44,3 +44,5 @@ class TableViewSimpleExample {
 See simple example.
 
 ![preview](https://raw.githubusercontent.com/Rasarts/AComponents/table_view/TableView/preview/table_view_preview.gif)
+
+[Immutability Vs Encapsulation](https://vsavkin.com/immutability-vs-encapsulation-90549ab74487)
